@@ -16,22 +16,31 @@ def find_in_file(file_name):
             return find_ways(text)
     except FileNotFoundError:
         print("file was not found. Please check the file path")
-        return None
+        return []
     except IsADirectoryError:
         print("specified path is directory not a file")
-        return None
+        return []
     except Exception as e:
         print(f"unexpected error occurred: {e}")
-        return None
+        return []
 
 def find_in_input_text():
     inp_text=input("enter string:" )
     return find_ways(inp_text)
 
-def find_in_site(text, url):
-    if not isinstance(text, str) or not isinstance(url, str):
+def find_in_site(url):
+    if not isinstance(url, str):
         raise TypeError("text or url must be string")
-    response=re
+    try:
+       response = requests.get(url)
+       response.raise_for_status()
+       html = response.text
+       soup = BeautifulSoup(html, 'html.parser')
+       text = soup.get_text(strip=True)
+       return find_ways(text)
+    except requests.RequestException as e:
+        print(f"error fetching url: {e}")
+        return []
 
 def main():
     print("ku")
