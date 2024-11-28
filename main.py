@@ -43,7 +43,6 @@ def find_in_site(url):
         return []
 
 def main():
-    print("ku")
 
 
 if __name__ == '__main__':
