@@ -46,7 +46,28 @@ class TestFindInInputText(unittest.TestCase):
 
 
 class TestFindInSite(unittest.TestCase):
-    pass
+    @patch("main.requests.get")
+    @patch("main.find_credit_card_numbers", return_value=["4111 1111 1111 1111"])
+    def test_find_in_site_valid(self, mock_find, mock_get):
+        mock_response = Mock()
+        mock_response.status_code = 200
+        mock_response.text = "<html><body>My card is 4111 1111 1111 1111</body></html>"
+        mock_get.return_value = mock_response
+        result = find_in_site("http://example.com")
+        mock_get.assert_called_once_with("http://example.com")
+        mock_find.assert_called_once_with("My card is 4111 1111 1111 1111")
+        self.assertEqual(result, ["4111 1111 1111 1111"])
+
+    @patch("main.requests.get")
+    def test_find_in_site_request_error(self, mock_get):
+        mock_get.side_effect = requests.RequestException("Network error")
+        result = find_in_site("http://example.com")
+        mock_get.assert_called_once_with("http://example.com")
+        self.assertEqual(result, [])
+
+    def test_find_in_site_invalid_input(self):
+        with self.assertRaises(TypeError):
+            find_in_site(12345)
 
 
 
