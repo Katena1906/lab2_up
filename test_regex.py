@@ -1,8 +1,7 @@
 import unittest
-import os
 import requests
 from main import find_credit_card_numbers, find_in_file, find_in_input_text, find_in_site
-from unittest.mock import patch, Mock
+from unittest.mock import patch, Mock, mock_open
 
 class TestFindCreditCardNumbers(unittest.TestCase):
     def test_find_credit_card_numbers(self):
@@ -21,15 +20,13 @@ class TestFindCreditCardNumbers(unittest.TestCase):
         self.assertEqual(find_credit_card_numbers(text), expected)
 
 class TestFindInFile(unittest.TestCase):
-    def test_find_in_file_valid(self):
-        temp = "test.txt"
-        with open(temp, "w", encoding="utf-8") as f:
-            f.write("1222 5585 8585 9494\n4747 4884 4844 3373")
+    @patch('builtins.open', new_callable=mock_open, read_data="1222 5585 8585 9494\n4747 4884 4844 3373")
+    def test_find_in_file_valid(self, mock_open):
         expected =['1222 5585 8585 9494','4747 4884 4844 3373']
-        self.assertEqual(find_in_file(temp), expected)
-        os.remove(temp)
+        self.assertEqual(find_in_file("test.txt"), expected)
 
-    def test_find_in_file_not_found(self):
+    @patch('builtins.open', side_effect=FileNotFoundError)
+    def test_find_in_file_not_found(self, mock_open):
         self.assertEqual(find_in_file("non_existent_file.txt"), [])
 
     def test_find_in_file_invalid_input(self):
@@ -38,8 +35,8 @@ class TestFindInFile(unittest.TestCase):
 
 
 class TestFindInInputText(unittest.TestCase):
-    def test_find_in_input_text_manual(self):
-        print("Enter the following string manually: 'My card is 4111 1111 1111 1111'")
+    @patch("builtins.input", return_value="My card is 4111 1111 1111 1111")
+    def test_find_in_input_text_manual(self, mock_input):
         result = find_in_input_text()
         expected = ["4111 1111 1111 1111"]
         self.assertEqual(result, expected)

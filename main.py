@@ -2,7 +2,6 @@ import re
 import requests
 from bs4 import BeautifulSoup
 
-
 def find_credit_card_numbers(text):
     if not isinstance(text, str):
         raise TypeError("Input must be a string")
@@ -45,8 +44,6 @@ def find_in_site(url):
         return []
 
 def main():
-    print("ku")
-
-
+    print("Тесты Тесты")
 if __name__ == '__main__':
     main()
